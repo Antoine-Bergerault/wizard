@@ -18,7 +18,7 @@ function log(msg, log) {
 class DB {
     constructor() {
         let config = {
-            apiKey: "",
+            apiKey: process.env.API_KEY,
             authDomain: "wizard-fr.firebaseapp.com",
             databaseURL: "https://wizard-fr.firebaseio.com",
             projectId: "wizard-fr",

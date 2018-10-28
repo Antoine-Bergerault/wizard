@@ -19,9 +19,9 @@ const fct_choose_home = require('./files/survey.js');
 const reaction_command = require('./files/reaction_command.js');
 
 // CONSTANTS VAR
-const id_guild = "";
+const id_guild = process.env.ID_GUILD;
 const tag = "wiz-";
-const token = '';
+const token = process.env.TOKEN;
 
 // on fusionne les deux fichiers pour avoir un seul fichier de commandes lors de l'execution
 commands = commands.concat(spells);
