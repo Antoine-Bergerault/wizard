@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "name": "Get started !",
+        "reward": {
+            "xp": 5,
+            "galleons": 10
+        },
+        "condition": "buy a healing potion"
+    }
+]
