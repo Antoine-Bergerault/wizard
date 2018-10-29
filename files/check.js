@@ -3,6 +3,7 @@ const main = require('./../bot.js');
 const bot = main.bot;
 const Discord = require('discord.js');
 const DB = main.database;
+const questions = require('./json/questions_survey.json');
 
 const check = function(id, name, avatar, member, _new) {
     avatar = avatar || '';
@@ -38,7 +39,13 @@ const check = function(id, name, avatar, member, _new) {
                     xp: 0,
                     level: 1,
                     spells: "",
-                    dodge: 2
+                    dodge: 2,
+                    survey: "q1",
+                    answers: {
+                        a1: "none",
+                        a2: "none",
+                        a3: "none",
+                    }
                 }
             };
             
@@ -57,7 +64,14 @@ const check = function(id, name, avatar, member, _new) {
                 
                     channel.send(embed);
                     channel.send(":warning: When you enter the server, your profile photo, your nickname and your discord ID are automatically stored in our database, for non-commercial purposes; if you do not"
-                    +" agree, look at <#504635326925373470>\nIf your account was reset, please DM ドリアン#8850, thanks");
+                    +" agree, look at #information\nIf your account was reset, please DM ドリアン#8850, thanks");
+
+                    channel.send("```SURVEY !```If you want to be on one of the fourth home, you must answer to 3 little questions.\n**Question 1:**\n*"+questions[0].question+"*").then(message => {
+                        message.react("\u0031\u20E3");
+                        message.react("\u0032\u20E3");
+                        message.react("\u0033\u20E3");
+                        message.react("\u0034\u20E3");
+                    });
                 });
                 console.log('compte créé ! --> '+name);
             } catch(error) {

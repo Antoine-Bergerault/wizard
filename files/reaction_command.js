@@ -6,7 +6,7 @@ const firebase = require('firebase');
 const items = require('./json/items.json');
 const check = require('./check.js');
 
-const reaction_command = function(reaction, user) {
+const reaction_command = function(reaction, user, profile) {
     let object = {};
     for(i in items) {
         let item = items[i].id;
@@ -18,22 +18,8 @@ const reaction_command = function(reaction, user) {
             };
         }
     }
-
-    let profile = [];
-    DB.profile(user.id).getData('', function(data) {
-        profile = data.val();
-    });
-
-    setTimeout(() => {
-        if(profile==undefined) {
-            check(user.id, user.username+"#"+user.discriminator, user.avatarURL, user);
-            setTimeout(() => {
-                traitement(reaction, user, profile, object);
-            }, DB.responseTime);
-        } else {
-            traitement(reaction, user, profile, object);
-        }
-    }, DB.responseTime);
+    
+    traitement(reaction, user, profile, object);
 }
 
 function traitement(reaction, user, profile, object) {

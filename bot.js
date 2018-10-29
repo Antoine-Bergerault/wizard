@@ -31,7 +31,6 @@ let aCommands = [];
 for(i=0; i<commands.length; i++) {
     aCommands.push(commands[i].name);
 }
-console.log(aCommands);
 
 /** ******************************************************************* **/
 /** ******************************************************************* **/
@@ -39,42 +38,46 @@ console.log(aCommands);
 // quand un user écrit un msg
 bot.on('message', (msg) => {
     member = msg.author;
-    if(member.id != "316639200462241792" && member.id != "207218344187789315") {
+    if(member.id != "316639200462241792" && member.id != "207218344187789315" && member.id!="314475641883852801") {
         return;
     }
 
     check(member.id, member.username+"#"+member.discriminator, member.avatarURL, member);
     
-        Database.setAuthor(msg.author);
-        Database.profile(msg.author.id);
-        
-        roles = ['Gryffindor','Hufflepuff','Ravenclaw','Slytherin'];
-        // on actualise toutes les infos en ligne
-        // si l'utilisateur n'est pas dans une maison / ou si le bot est reset
-        for(i in roles) {
-            role = msg.guild.roles.find('name',roles[i]).id;
-            if(msg.guild.members.get(member.id).roles.has(role)) {
-                Database.updateData('game/home', {name:roles[i],id:role});
-            }
-        }
+    Database.setAuthor(msg.author);
+    Database.profile(msg.author.id);
+    let home_user = "none";
 
-        let profile_data = [];
+    let profile_data = [];
 
-        Database.getData('', function(data) {
-            profile_data = data.val();
-        });
+    Database.getData('', function(data) {
+        profile_data = data.val();
+    });
 
-        setTimeout(() => {
-            if(profile_data.account.banned==0 && profile_data.account.active==1) {
-                if(profile_data.game.home == "choosing") {
-                    fct_choose_home(msg, member);
-                } else {
-                    get_message(msg, profile_data);
+    setTimeout(() => {
+        if(msg.channel.type!=="dm") {
+            // on actualise toutes les infos en ligne
+            // si l'utilisateur n'est pas dans une maison / ou si le bot est reset
+            if(profile_data.game.home.name!=="none") {
+                try {
+                    role = msg.guild.roles.find('name', profile_data.game.home.name);
+                    home_id = role.id;
+
+                    Database.profile(member.id).updateData('game/home/id', home_id);
+                    Database.profile(user.id).deleteData('game/home/become');
+                    member.addRole(role);
+                } catch(error) {
+
                 }
-
-                Database.updateData('game/xp', profile_data.game.xp+0.1);
             }
-        }, Database.responseTime+300);
+            
+            if(profile_data.account.banned==0 && profile_data.account.active==1) {
+                get_message(msg, profile_data);
+            }
+
+            Database.profile(member.id).updateData('game/xp', profile_data.game.xp+0.1);
+        }
+    }, Database.responseTime+300);
 });
 
 /** ******************************************************************* **/
@@ -82,7 +85,28 @@ bot.on('message', (msg) => {
 /* si un user réagit */
 
 bot.on('messageReactionAdd', (reaction, user) => {
-    if(user.id!="457192864645120000") reaction_command(reaction, user);
+    if(user.id!="457192864645120000") {
+        check(user.id, user.username+"#"+user.discriminator, user.avatarURL, user);
+        Database.setAuthor(user);
+        Database.profile(user.id);
+        
+        let profile_data = [];
+
+        Database.getData('', function(data) {
+            profile_data = data.val();
+        });
+        setTimeout(function() {
+            if(reaction.message.author.id=="457192864645120000") {
+                if(profile_data.account.banned==0 && profile_data.account.active==1) {
+                    if(profile_data.game.home == "none") {
+                        fct_choose_home(reaction, user, profile_data);
+                    } else {
+                        reaction_command(reaction, user, profile_data);
+                    }
+                }
+            }
+        }, DB.responseTime);
+    }
 });
 
 /** ******************************************************************* **/
@@ -110,9 +134,9 @@ bot.on("guildMemberAdd", member => {
     member.addRole(role);
 
     let embed = new Discord.RichEmbed()
-        .setTitle('a Muggle !') 
+        .setTitle('A Muggle !') 
         .setColor(0xF9B234)
-        .addField(` • ` + member.user.username + " Welcome to The Marauders ");
+        .addField(` • ` + member.user.username + " Welcome to The Marauders");
         
     bot.guilds.find('id', id_guild).channels.find('name','diagon_alley').send(embed);
     check(member.id, member.user.username+"#"+member.user.discriminator, member.user.avatarURL, member, true);

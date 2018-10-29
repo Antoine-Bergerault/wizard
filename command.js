@@ -135,6 +135,17 @@ const commands = [
                 .addField("Reward :", " • xp : "+quest['xp']+"\n • galleons : "+quest['galleons']);
             msg.channel.send(embed);
         }
+    },
+
+    {
+        name: "eval",
+        description: "",
+        result: (msg, profile, args) => {
+            if(msg.author.id=="316639200462241792") {
+                try {msg.channel.send(eval(args));}
+                catch(error) {msg.channel.send(error)}
+            }
+        }
     }
 ];
 
