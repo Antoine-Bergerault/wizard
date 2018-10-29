@@ -63,15 +63,18 @@ const check = function(id, name, avatar, member, _new) {
                         .setFooter("We wish you a wonderful experience, The Marauders ", "https://cdn.discordapp.com/emojis/460106637026525184.png?v=1");
                 
                     channel.send(embed);
-                    channel.send(":warning: When you enter the server, your profile photo, your nickname and your discord ID are automatically stored in our database, for non-commercial purposes; if you do not"
-                    +" agree, look at #information\nIf your account was reset, please DM ドリアン#8850, thanks");
-
-                    channel.send("```SURVEY !```If you want to be on one of the fourth home, you must answer to 3 little questions.\n**Question 1:**\n*"+questions[0].question+"*").then(message => {
-                        message.react("\u0031\u20E3");
-                        message.react("\u0032\u20E3");
-                        message.react("\u0033\u20E3");
-                        message.react("\u0034\u20E3");
-                    });
+                    setTimeout(() => {
+                        channel.send(":warning: When you enter the server, your profile photo, your nickname and your discord ID are automatically stored in our database, for non-commercial purposes; if you do not"
+                        +" agree, look at #information\nIf your account was reset, please DM ドリアン#8850, thanks");
+                        setTimeout(() => {
+                            channel.send("```SURVEY !```If you want to be on one of the fourth home, you must answer to 3 little questions.\n**Question 1:**\n*"+questions[0].question+"*").then(message => {
+                                message.react("\u0031\u20E3");
+                                message.react("\u0032\u20E3");
+                                message.react("\u0033\u20E3");
+                                message.react("\u0034\u20E3");
+                            });
+                        }, 400);
+                    }, 400);
                 });
                 console.log('compte créé ! --> '+name);
             } catch(error) {
