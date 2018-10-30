@@ -39,9 +39,9 @@ for(i=0; i<commands.length; i++) {
 // quand un user écrit un msg
 bot.on('message', (msg) => {
     member = msg.author;
-    if(member.id != "316639200462241792" && member.id != "207218344187789315" && member.bot) {
+    /*if(member.id != "316639200462241792" && member.id != "207218344187789315" && member.bot) {
         return;
-    }
+    }*/
     try {
         check(member.id, member.username+"#"+member.discriminator, member.avatarURL, member);
         
