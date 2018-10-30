@@ -47,7 +47,7 @@ const check = function(id, name, avatar, member, _new) {
                         a2: "none",
                         a3: "none",
                     },
-                    home_point,s: 0,
+                    home_point: 0,
                     kill: 0,
                     daily: 0
                 }
