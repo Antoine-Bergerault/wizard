@@ -9,12 +9,13 @@ const DB = main.database;
 let n_code = ["\u0034\u20E3","\u0031\u20E3","\u0032\u20E3","\u0033\u20E3"];
 let n_identifier = ["1%E2%83%A3","2%E2%83%A3","3%E2%83%A3","4%E2%83%A3"];
 let n = [1,2,3,4];
-let volontaires = ["316639200462241792"]//, "456475577755369474", "396421738067394560", "327571360970965003", "314475641883852801"]
+let volontaires = [
+    "316639200462241792"]//, "456475577755369474", "396421738067394560", 
+    //"327571360970965003", "314475641883852801", "207218344187789315"]
 
 const survey = function(reaction, user, profile) {
 
     progress = profile.game.survey;
-
     switch(progress) {
         case questions[0].name:
             get_answer(reaction, user, profile, 0);
@@ -29,6 +30,8 @@ const survey = function(reaction, user, profile) {
 }
 
 function get_answer(reaction, user, profile, i) {
+    if(reaction.message.content!="**Question "+(i+1)+":**\n*"+questions[i].question+"*") return;
+
     let index = n_identifier.indexOf(reaction.emoji.identifier)
     if(index>-1) {
         console.log("Choix: "+n[index]+"\nCorrespond à: "+questions[i].answer["r"+n[index]]);
@@ -85,10 +88,11 @@ function get_answer(reaction, user, profile, i) {
                 console.log(rsp);
                 home = rsp[0].name;
                 console.log("home: "+home);
-                channel.send(home+" home !\nTalk one time to obtain your role");
+                channel.send(home+" home !");
 
-                DB.profile(user.id).updateData('game/home', {id:"", name: home, become: "true"});
+                DB.profile(user.id).updateData('game/home', {id:"", name: home});
                 DB.profile(user.id).deleteData('game/answers');
+                DB.profile(user.id).deleteData('game/survey');
 
                 let embed = new Discord.RichEmbed()
                     .setTitle('Le choixpeau magique a décidé !')

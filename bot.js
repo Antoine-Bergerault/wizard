@@ -6,7 +6,6 @@ const DB = require('./files/DB.js');
 
 // LET IMPORTANTES
 let exportObj = module.exports = {};
-let wizard_creation_base = require('./files/wizard_creation_base.js');
 let Database = new DB();
 exportObj.database = Database;
 exportObj.bot = bot;
@@ -16,6 +15,8 @@ let commands = require('./command.js');
 const spells = require('./spells.js'); 
 const check = require('./files/check.js');
 const fct_choose_home = require('./files/survey.js');
+const quests = require('./files/quests.js');
+const quest_completed = require('./files/quest_completed.js');
 const reaction_command = require('./files/reaction_command.js');
 
 // CONSTANTS VAR
@@ -38,46 +39,47 @@ for(i=0; i<commands.length; i++) {
 // quand un user écrit un msg
 bot.on('message', (msg) => {
     member = msg.author;
-    if(member.id != "316639200462241792" && member.id != "207218344187789315" && member.id!="314475641883852801") {
+    if(member.id != "316639200462241792" && member.id != "207218344187789315" && member.bot) {
         return;
     }
+    try {
+        check(member.id, member.username+"#"+member.discriminator, member.avatarURL, member);
+        
+        Database.setAuthor(msg.author);
+        Database.profile(msg.author.id);
+        let home_user = "none";
 
-    check(member.id, member.username+"#"+member.discriminator, member.avatarURL, member);
-    
-    Database.setAuthor(msg.author);
-    Database.profile(msg.author.id);
-    let home_user = "none";
+        let profile_data = [];
 
-    let profile_data = [];
+        Database.getData('', (data) => {
+            profile_data = data.val();
+        });
+        setTimeout(() => {
+            if(msg.channel.type!=="dm") {
+                // on actualise toutes les infos en ligne
+                // si l'utilisateur n'est pas dans une maison / ou si le bot est reset
+                if(profile_data.game.home===undefined || profile_data.game.home.name!=="none") {
+                    try {
+                        role = msg.guild.roles.find('name', profile_data.game.home.name);
+                        home_id = role.id;
+                        Database.profile(member.id).updateData('game/home/id', home_id);
+                        member.addRole(role);
+                    } catch(error) {
 
-    Database.getData('', function(data) {
-        profile_data = data.val();
-    });
-
-    setTimeout(() => {
-        if(msg.channel.type!=="dm") {
-            // on actualise toutes les infos en ligne
-            // si l'utilisateur n'est pas dans une maison / ou si le bot est reset
-            if(profile_data.game.home.name!=="none") {
-                try {
-                    role = msg.guild.roles.find('name', profile_data.game.home.name);
-                    home_id = role.id;
-
-                    Database.profile(member.id).updateData('game/home/id', home_id);
-                    Database.profile(user.id).deleteData('game/home/become');
-                    member.addRole(role);
-                } catch(error) {
-
+                    }
+                }
+                
+                if(profile_data.account.banned==0 && profile_data.account.active==1) {
+                    if(quests(msg, profile_data, 1)) quest_completed(member, profile_data);
+                    get_message(msg, profile_data);
+                    Database.profile(member.id).updateData('game/xp', profile_data.game.xp+0.1);
                 }
             }
-            
-            if(profile_data.account.banned==0 && profile_data.account.active==1) {
-                get_message(msg, profile_data);
-            }
-
-            Database.profile(member.id).updateData('game/xp', profile_data.game.xp+0.1);
-        }
-    }, Database.responseTime+300);
+        }, Database.responseTime+300);
+    } catch(error) {
+        console.log("erreur .onMessage");
+        console.log(error);
+    }
 });
 
 /** ******************************************************************* **/
@@ -85,27 +87,33 @@ bot.on('message', (msg) => {
 /* si un user réagit */
 
 bot.on('messageReactionAdd', (reaction, user) => {
-    if(user.id!="457192864645120000") {
-        check(user.id, user.username+"#"+user.discriminator, user.avatarURL, user);
-        Database.setAuthor(user);
-        Database.profile(user.id);
-        
-        let profile_data = [];
+    try {
+        if(user.id!="457192864645120000") {
+            check(user.id, user.username+"#"+user.discriminator, user.avatarURL, user);
+            Database.setAuthor(user);
+            Database.profile(user.id);
+            
+            let profile_data = [];
 
-        Database.getData('', function(data) {
-            profile_data = data.val();
-        });
-        setTimeout(function() {
-            if(reaction.message.author.id=="457192864645120000") {
-                if(profile_data.account.banned==0 && profile_data.account.active==1) {
-                    if(profile_data.game.home == "none") {
-                        fct_choose_home(reaction, user, profile_data);
-                    } else {
-                        reaction_command(reaction, user, profile_data);
+            Database.getData('', (data) => {
+                profile_data = data.val();
+            });
+            setTimeout(function() {
+                if(reaction.message.author.id=="457192864645120000") {
+                    if(quests(reaction, profile_data, 0)) quest_completed(user, profile_data);
+                    if(profile_data.account.banned==0 && profile_data.account.active==1) {
+                        if(profile_data.game.home == "none") {
+                            fct_choose_home(reaction, user, profile_data);
+                        } else {
+                            reaction_command(reaction, user, profile_data);
+                        }
                     }
                 }
-            }
-        }, DB.responseTime);
+            }, DB.responseTime);
+        }
+    } catch(error) {
+        console.log("Reaction error:");
+        console.log(error);
     }
 });
 

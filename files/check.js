@@ -24,13 +24,14 @@ const check = function(id, name, avatar, member, _new) {
                     name: name,
                     picture: avatar,
                     year: Date.now(),
-                    yid: id,
+                    id: id,
                     active: 1,
-                    banned: 0
+                    banned: 0,
+                    about: "nothing"
                 },
                 
                 game: {
-                    galleons: 68,
+                    galleons: 20,
                     inventory: '',
                     home: 'none',
                     quest: 1,
@@ -45,7 +46,10 @@ const check = function(id, name, avatar, member, _new) {
                         a1: "none",
                         a2: "none",
                         a3: "none",
-                    }
+                    },
+                    home_point,s: 0,
+                    kill: 0,
+                    daily: 0
                 }
             };
             
@@ -67,7 +71,8 @@ const check = function(id, name, avatar, member, _new) {
                         channel.send(":warning: When you enter the server, your profile photo, your nickname and your discord ID are automatically stored in our database, for non-commercial purposes; if you do not"
                         +" agree, look at #information\nIf your account was reset, please DM ドリアン#8850, thanks");
                         setTimeout(() => {
-                            channel.send("```SURVEY !```If you want to be on one of the fourth home, you must answer to 3 little questions.\n**Question 1:**\n*"+questions[0].question+"*").then(message => {
+                            channel.send("```SURVEY !```If you want to be on one of the fourth home, you must answer to 3 little questions.");
+                            channel.send("\n**Question 1:**\n*"+questions[0].question+"*").then(message => {
                                 message.react("\u0031\u20E3");
                                 message.react("\u0032\u20E3");
                                 message.react("\u0033\u20E3");
@@ -90,6 +95,8 @@ const check = function(id, name, avatar, member, _new) {
                 while(Math.pow(level,2.3)*10<xp) {
                     level++;
                 }
+
+                if(level>50) level = 50;
 
                 DB.profile(id).updateData('game/level', level);
             } catch(error) {

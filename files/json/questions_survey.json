@@ -23,7 +23,7 @@
 
     {
         "name": "q3",
-        "question": "Who are you ?\n • (1) Loyal\n • (2) Determined\n • (3) Patient\n • (4) Curious",
+        "question": "What are you ?\n • (1) Loyal\n • (2) Determined\n • (3) Patient\n • (4) Curious",
         "answer": {
             "r1": "Gryffindor",
             "r2": "Slytherin",

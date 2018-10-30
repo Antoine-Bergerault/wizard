@@ -44,7 +44,7 @@
     {
         "name": "wand",
         "id": "459380507503886351",
-        "price": "50"
+        "price": "20"
     },
 
     {
@@ -60,14 +60,14 @@
     },
 
     {
-        "name": "potion_bottle",
-        "id": "459380508099608578",
+        "name": "healing_potion",
+        "id": "459380508615245834",
         "price": "2"
     },
 
     {
-        "name": "big_potion_bottle",
-        "id": "459380508615245834",
+        "name": "healing_potion_bottle",
+        "id": "459380508099608578",
         "price": "20"
     },
 

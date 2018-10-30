@@ -25,7 +25,7 @@ const reaction_command = function(reaction, user, profile) {
 function traitement(reaction, user, profile, object) {
     console.log("price: "+object.price+" | your money: "+profile.game.galleons);
     if(profile.game.galleons < object.price) {
-        bot.users.get(user.id).send("You don't have enought money to paid the `"+object.name+"`");
+        bot.users.get(user.id).send("You don't have enought money to paid the `"+object.name.replace(/_/g, " ")+"`");
     } else {
         bot.users.get(user.id).send("You bought "+(object.name.replace(/_/gi, " "))+" !");
 

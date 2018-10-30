@@ -35,7 +35,8 @@ const commands = [
                 "\n • XP : "+Math.floor(profile.game.xp)+"/"+levelUp+
                 "\n • Level : "+profile.game.level+
                 "\n • Life : "+profile.game.hp+
-                "\n • Quests completed : "+profile.game.quests_completed)
+                "\n • Quests completed : "+profile.game.quests_completed+
+                "\n • Kills : "+profile.game.kill)
                 .setFooter("Years at Hogwarts : " 
                 + (Math.floor((Date.now()-profile.account.year)/(3.154*Math.pow(10,10)))+1), '');
             msg.channel.send(embed);
@@ -118,22 +119,26 @@ const commands = [
         name: "quest",
         description: "",
         result: (msg, profile) => {
-            let quest = [];
-            for(i in quests) {
-                if(quests[i].id == profile.game.quest) {
-                    quest['name'] = quests[i].name;
-                    quest['condition'] = quests[i].condition;
-                    quest['xp'] = quests[i].reward.xp;
-                    quest['galleons'] = quests[i].reward.galleons;
+            if(profile.game.quests_completed==quests.length) {
+                msg.channel.send("You already have completed all the quests !");
+            } else {
+                let quest = [];
+                for(i in quests) {
+                    if(quests[i].id == profile.game.quest) {
+                        quest['name'] = quests[i].name;
+                        quest['condition'] = quests[i].condition;
+                        quest['xp'] = quests[i].reward.xp;
+                        quest['galleons'] = quests[i].reward.galleons;
+                    }
                 }
-            }
 
-            let embed = new Discord.RichEmbed()
-                .setTitle(quest['name'])
-                .setColor(0xF9B234)
-                .addField("Condition :",quest['condition'])
-                .addField("Reward :", " • xp : "+quest['xp']+"\n • galleons : "+quest['galleons']);
-            msg.channel.send(embed);
+                let embed = new Discord.RichEmbed()
+                    .setTitle(quest['name'])
+                    .setColor(0xF9B234)
+                    .addField("Condition :",quest['condition'])
+                    .addField("Reward :", " • xp : "+quest['xp']+"\n • galleons : "+quest['galleons']);
+                msg.channel.send(embed);
+            }
         }
     },
 
@@ -145,6 +150,91 @@ const commands = [
                 try {msg.channel.send(eval(args));}
                 catch(error) {msg.channel.send(error)}
             }
+        }
+    },
+
+    {
+        name: "daily",
+        description: "",
+        result: (msg, profile) => {
+            if(Date.now()-profile.game.daily>=79200000) {
+                profile.game.xp += 2;
+                profile.game.galleons += 2;
+                profile.game.daily = Date.now();
+                DB.profile(msg.author.id).updateData('game', profile.game);
+                msg.channel.send("**You obtain 2xp and 2 galleons ! Wait 22 hours before new daily**");
+            } else {
+                msg.channel.send("You must wait "+Math.floor((79200000-(Date.now()-profile.game.daily))/3600000)+" hours to claim your daily");
+            }
+        }
+    },
+
+    {
+        name: "homes",
+        description: "",
+        result: msg => {
+            let homes = [];
+            DB.source('homes').getData('', (data) => {
+                homes = data.val();
+            });
+
+            setTimeout(() => {
+                let txt = "";
+                
+                let homes_names = [];
+                for(i in homes) {
+                    homes_names.push([i, homes[i]]);
+                }
+
+                homes_names.sort(function(a, b) {
+                    return b[1] - a[1];
+                });
+
+                for(i in homes_names) {
+                    txt += "\t• "+homes_names[i][0]+(".".repeat(10-homes_names[i][0].length))+" ("+homes_names[i][1]+" points)";
+                    if(i==0) txt += " :crown:\n";
+                    else txt += "\n";
+                }
+
+                let embed = new Discord.RichEmbed()
+                    .setTitle("Homes Ranking")
+                    .setColor(0xF9B234)
+                    .setDescription(txt);
+                msg.channel.send(embed);
+            }, DB.responseTime);
+        }
+    },
+
+    {
+        name: "rank",
+        description: "",
+        result: (msg, profile) => {
+            let home = profile.game.home.name;
+            let profiles = [];
+            DB.source('profiles').getData('', (data) => {
+                profiles = data.val();
+            });
+
+            setTimeout(() => {
+                let home_user = [];
+                for(i in profiles) {
+                    if(profiles[i].game.home.name==home) home_user.push({name: profiles[i].account.name, points: profiles[i].game.home_points});
+                }
+
+                home_user.sort(function(a, b) {
+                    return b.points - a.points;
+                });
+
+                let txt = "```asciidoc\n= "+home+" Rank =\n";
+                for(i in home_user) {
+                    txt += home_user[i].name+(" ".repeat(40-home_user[i].name.length))+":: "+home_user[i].points+" pt.s";
+                    if(i==0) txt += " 👑 \n";
+                    else txt += "\n";
+                }
+                txt += "```";
+                msg.channel.send(txt);
+
+            }, DB.responseTime);
         }
     }
 ];
