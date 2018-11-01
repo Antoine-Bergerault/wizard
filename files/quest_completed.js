@@ -27,16 +27,16 @@ const quest_completed = (user, profile) => {
     profile.game.galleons = profile.game.galleons + quest.reward.galleons;
     profile.game.quest++;
     profile.game.quests_completed++;
-    profile.game.home_points += 2;
+    profile.game.home_point += 2;
     DB.profile(user.id).updateData('game', profile.game);
 
-    let home_points = 0;
+    let home_point = 0;
     DB.source('homes').getData(profile.game.home.name, (data) => {
-        home_points = data.val();
+        home_point = data.val();
     });
 
     setTimeout(() => {
-        DB.source('homes').updateData(profile.game.home.name, home_points+2);
+        DB.source('homes').updateData(profile.game.home.name, home_point+2);
     }, DB.responseTime);
 };
 

@@ -218,7 +218,7 @@ const commands = [
             setTimeout(() => {
                 let home_user = [];
                 for(i in profiles) {
-                    if(profiles[i].game.home.name==home) home_user.push({name: profiles[i].account.name, points: profiles[i].game.home_points});
+                    if(profiles[i].game.home.name==home) home_user.push({name: profiles[i].account.name, points: profiles[i].game.home_point});
                 }
 
                 home_user.sort(function(a, b) {

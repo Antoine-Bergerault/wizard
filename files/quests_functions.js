@@ -55,7 +55,7 @@ const quests = [
     {
         name: 7,
         result: (client, profile, type) => {
-            if(type) return profile.game.home_points >= 20;
+            if(type) return profile.game.home_point >= 20;
         }
     }
 ];

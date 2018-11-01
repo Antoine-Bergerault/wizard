@@ -125,16 +125,16 @@ function call_spell(msg, profile, name_spell, ennemy) {
                                 profile.game.xp += 5;
                                 profile.game.galleons += 1;
                                 profile.game.kill += 1;
-                                profile.game.home_points += 1;
+                                profile.game.home_point += 1;
                                 DB.profile(profile.account.id).updateData("game", profile.game);
                                 
-                                let home_points = 0;
+                                let home_point = 0;
                                 DB.source('homes').getData(profile.game.home.name, (data) => {
-                                    home_points = data.val();
+                                    home_point = data.val();
                                 });
 
                                 setTimeout(() => {
-                                    DB.source('homes').updateData(profile.game.home.name, home_points+1);
+                                    DB.source('homes').updateData(profile.game.home.name, home_point+1);
                                 }, DB.responseTime);
                             }
                             DB.profile(profile.account.id).updateData('game/spells/'+name_spell, Date.now());
